@@ -1,0 +1,72 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: nomad
+  namespace: nomad
+spec:
+  serviceName: nomad
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: nomad
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - nomad
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: nomad
+          image: "gcr.io/hightowerlabs/nomad:0.6.3"
+          args:
+            - "agent"
+            - "-config=/etc/nomad/nomad.d/server.hcl"
+          ports:
+            - name: http
+              containerPort: 4646
+              protocol: "TCP"
+            - name: rpc
+              containerPort: 4647
+              protocol: "TCP"
+            - name: serf-tcp
+              containerPort: 4648
+              protocol: "TCP"
+            - name: serf-udp
+              containerPort: 4648
+              protocol: "UDP"
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+          volumeMounts:
+            - name: nomad-config
+              mountPath: /etc/nomad/nomad.d
+            - name: nomad-data
+              mountPath: /var/lib/nomad
+            - name: nomad-tls
+              mountPath: /etc/nomad/tls
+      terminationGracePeriodSeconds: 10
+      securityContext:
+        fsGroup: 1000
+      volumes:
+        - name: nomad-config
+          configMap:
+            name: nomad
+        - name: nomad-tls
+          secret:
+            secretName: nomad
+  volumeClaimTemplates:
+    - metadata:
+        name: nomad-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
