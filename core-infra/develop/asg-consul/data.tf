@@ -20,6 +20,13 @@ data "kubernetes_secret" "tool_token" {
   }
 }
 
+data "kubernetes_secret" "tool_tls_ca" {
+  metadata {
+    name = "${local.tool_name}-tls-ca"
+    namespace = local.tool_name
+  }
+}
+
 data "aws_ssm_parameter" "consul_keyring" {
   name = "/secrets/core-infra/develop/consul_keyring"
 }
@@ -58,6 +65,7 @@ data "template_file" "user_data" {
     consul_version = var.consul_version
     consul_hcl_file_content = data.template_file.consul_hcl.rendered
     consul_service_file_content = data.template_file.consul_service.rendered
+    tls_ca_file = data.kubernetes_secret.tool_tls_ca.data["ca"]
   }
 }
 

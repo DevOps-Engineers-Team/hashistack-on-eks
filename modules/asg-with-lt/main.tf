@@ -45,6 +45,14 @@ resource "aws_launch_template" "asg_lt" {
       arn = aws_iam_instance_profile.asg_profile.arn
     }
 
+    tag_specifications {
+    resource_type = "instance"
+
+    tags = {
+      Name = var.asg_name
+    }
+  }
+
     instance_type = var.instance_type
     image_id = var.image_id
 

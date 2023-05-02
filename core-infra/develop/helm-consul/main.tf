@@ -14,6 +14,17 @@ module "gossip_encrypt_key" {
   }
 }
 
+module "tls_ca" {
+  depends_on = [module.consul_namespace]
+  source               = "../../../modules/k8s-secret"
+  name                 = "${var.app_name}-tls-ca"
+  namespace            = var.kubernetes_namespace
+  data                 = {
+    ca_key = data.aws_ssm_parameter.consul_agent_ca_key.value
+    ca = data.aws_ssm_parameter.consul_agent_ca.value
+  }
+}
+
 module "consul_helm_chart" {
     depends_on = [module.gossip_encrypt_key]
     source = "../../../modules/generic-helm-release"
@@ -39,6 +50,7 @@ module "ingress_alb_cname" {
     nodeport_number = var.nodeport_service_number
     hosted_zone_id = data.aws_route53_zone.private.zone_id
     alb_scheme = var.priv_alb_scheme
+    backend_protocol = var.backend_protocol
 }
 
 module "ingress_alb_cname_temp" {
@@ -53,6 +65,7 @@ module "ingress_alb_cname_temp" {
     nodeport_number = var.nodeport_service_number
     hosted_zone_id = data.aws_route53_zone.public.zone_id
     alb_scheme = var.pub_alb_scheme
+    backend_protocol = var.backend_protocol
 }
 
 module "consul_server_lb" {
