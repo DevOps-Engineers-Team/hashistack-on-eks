@@ -17,3 +17,8 @@ variable "consul_version" {
 variable "datacenter_name" {
   default = "aws-eks"
 }
+
+variable "ssm_doc_commands" {
+  type = list(string)
+  default = ["systemctl stop consul"]
+}

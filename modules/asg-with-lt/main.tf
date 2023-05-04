@@ -63,7 +63,6 @@ resource "aws_launch_template" "asg_lt" {
 
 
 resource "aws_autoscaling_group" "asg" {
-  # availability_zones = var.az_list
   desired_capacity   = var.desired_cap
   max_size           = var.max_cap
   min_size           = var.min_cap
@@ -74,12 +73,13 @@ resource "aws_autoscaling_group" "asg" {
   }
 }
 
-# resource "aws_autoscaling_lifecycle_hook" "asg_lifecycle_hook" {
-#   name                   =  "${var.asg_name}-lifecycle-hook"
-#   autoscaling_group_name = aws_autoscaling_group.asg.name
-#   lifecycle_transition   = var.lifecycle_transition # "autoscaling:EC2_INSTANCE_LAUNCHING"
-#   role_arn                = aws_iam_role.asg_role.arn
-# }
+resource "aws_autoscaling_lifecycle_hook" "asg_termination_lifecycle_hook" {
+  name                   =  "${var.asg_name}-lifecycle-hook"
+  autoscaling_group_name = aws_autoscaling_group.asg.name
+  lifecycle_transition   = var.asg_lifecycle_transition
+  default_result         = var.asg_default_result
+  role_arn                = aws_iam_role.asg_role.arn
+}
 
 resource "aws_iam_instance_profile" "asg_profile" {
   name = "${var.asg_name}-profile"
