@@ -12,7 +12,8 @@ resource "null_resource" "consul_backup" {
         CONSUL_LEADER_NODE=$(kubectl -n consul exec consul-develop-consul-server-1 -- sh -c "export CONSUL_HTTP_TOKEN=$CONSUL_TOKEN && consul operator raft list-peers | grep leader | sed 's/ /\n/g' | grep consul | sed 's/\"//g'")
         kubectl -n consul exec $CONSUL_LEADER_NODE -- sh -c "export CONSUL_HTTP_TOKEN=$CONSUL_TOKEN && cd /consul/extra-config && consul snapshot save backup-$SNAPSHOT.snap"
         kubectl cp consul/$CONSUL_LEADER_NODE:/consul/extra-config/backup-$SNAPSHOT.snap ./backup-$SNAPSHOT.snap
-        
+        aws s3 cp ./backup-$SNAPSHOT.snap s3://consul-snapshots-storage/backup-$SNAPSHOT.snap
+        rm backup-$SNAPSHOT.snap
     EOT
 
     environment = {

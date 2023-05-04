@@ -1,6 +1,6 @@
 locals {
   environment   = basename(dirname(path.cwd))
-  config_name = basename(dirname(dirname(path.cwd)))
+  config_name = "core-infra"
   tool_name = "consul"
   application  = "gitops"
   cluster_name = "${local.config_name}-${local.environment}-${local.application}-cluster"
