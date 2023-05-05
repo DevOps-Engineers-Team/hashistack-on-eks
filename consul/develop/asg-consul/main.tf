@@ -8,9 +8,10 @@ module "asg_consul" {
 }
 
 module "ssm_doc_stop_consul" {
-  source        = "../../../modules/ssm-document"
+  source        = "../../../modules/asg-events-to-ssm"
 
+  cw_event_name = "${var.asg_name}-lifecycle-event"
   document_name = "${var.asg_name}-systemctl-stop"
-  document_description = "Stopping systemctl of consul on termnated EC2"
+  asg_arn = module.asg_consul.asg_arn
   shell_commands = var.ssm_doc_commands
 }
