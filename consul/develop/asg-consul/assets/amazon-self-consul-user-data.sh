@@ -28,5 +28,3 @@ ${consul_service_file_content}
 EOF
 
 su "ec2-user" -c "sudo systemctl start consul"
-
-# su "ec2-user" -c "u+rwx /home/ec2-user/consul-agent-ca.pem"
