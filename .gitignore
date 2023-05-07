@@ -29,6 +29,7 @@ override.tf.json
 # example: *tfplan*
 
 **/kubeconfig_**
+**/backup**
 
 **/acm-key
 **/acm-cert

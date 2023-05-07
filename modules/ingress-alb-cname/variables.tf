@@ -14,6 +14,10 @@ variable "nodeport_number" {
     type = number
 }
 
+variable "backend_protocol" {
+    default = "HTTP"
+}
+
 variable "healthcheck_path" {
     default = "/"
 }

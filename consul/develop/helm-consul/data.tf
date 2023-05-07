@@ -6,6 +6,12 @@ module "helm_config" {
   server_expose_service_type = var.server_expose_service_type
   image_version = var.image_version
   datacenter_name = var.datacenter_name
+  enable_tls = var.enable_tls
+  enable_auto_encrypt = var.enable_auto_encrypt
+  ca_cert_secret_name = local.ca_cert_secret_name
+  ca_cert_secret_key = var.ca_cert_secret_key
+  ca_key_secret_name = local.ca_key_secret_name
+  ca_key_secret_key = var.ca_key_secret_key
 }
 
 data "aws_eks_cluster" "cluster" {
@@ -32,4 +38,12 @@ data "aws_route53_zone" "public" {
 
 data "aws_ssm_parameter" "consul_keyring" {
   name = "/secrets/core-infra/develop/consul_keyring"
+}
+
+data "aws_ssm_parameter" "consul_agent_ca_key" {
+  name = "/secrets/core-infra/develop/consul_agent_ca_key"
+}
+
+data "aws_ssm_parameter" "consul_agent_ca" {
+  name = "/secrets/core-infra/develop/consul_agent_ca"
 }

@@ -3,6 +3,8 @@ locals {
   config_name = basename(dirname(dirname(path.cwd)))
   application  = "gitops"
   cluster_name = "${local.config_name}-${local.environment}-${local.application}-cluster"
+  ca_cert_secret_name = "${var.app_name}-tls-ca"
+  ca_key_secret_name = "${var.app_name}-tls-ca"
 }
 
 variable "app_name" {
@@ -56,7 +58,7 @@ variable "target_domain" {
 }
 
 variable "nodeport_service_number" {
-  default = 80
+  default = 443
 }
 
 variable "priv_alb_scheme" {
@@ -71,9 +73,32 @@ variable "success_codes" {
     default = "200-301"
 }
 
+variable "backend_protocol" {
+    default = "HTTPS"
+}
+
 variable "manage_system_acl" {
     type = bool
     default = true
+}
+
+variable "enable_tls" {
+    type = bool
+    default = true
+}
+
+variable "enable_auto_encrypt" {
+    type = bool
+    default = true
+}
+
+
+variable "ca_cert_secret_key" {
+    default = "ca"
+}
+
+variable "ca_key_secret_key" {
+    default = "ca_key"
 }
 
 variable "server_expose_service_type" {

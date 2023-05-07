@@ -14,3 +14,13 @@ acl = {
     agent = "${consul_acl_token}"
   }
 }
+
+verify_incoming = true
+verify_outgoing = true
+verify_server_hostname = true
+
+ca_file = "/home/ec2-user/consul-agent-ca.pem"
+
+auto_encrypt = {
+  tls = true
+}
