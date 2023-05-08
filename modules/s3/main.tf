@@ -25,8 +25,8 @@ resource "aws_kms_alias" "s3_key_alias" {
   target_key_id = aws_kms_key.s3_key.key_id
 }
 
-resource "aws_s3_bucket" "backend" {
-  bucket = "${var.bucket_name}-${var.bucket_name_postfix}"
+resource "aws_s3_bucket" "bucket" {
+  bucket = local.full_bucket_name
   policy = data.aws_iam_policy_document.allow_access_from_other_envs.json
 
   versioning {
@@ -71,8 +71,8 @@ data "aws_iam_policy_document" "allow_access_from_other_envs" {
     effect = "Allow"
 
     resources = [
-      "arn:aws:s3:::${var.bucket_name}-${var.bucket_name_postfix}/*",
-      "arn:aws:s3:::${var.bucket_name}-${var.bucket_name_postfix}",
+      "arn:aws:s3:::${local.full_bucket_name}/*",
+      "arn:aws:s3:::${local.full_bucket_name}",
     ]
 
     principals {
@@ -86,11 +86,11 @@ data "aws_iam_policy_document" "allow_access_from_other_envs" {
 ### Outputs
 
 output "terraform_backend_s3_bucket_id" {
-  value = aws_s3_bucket.backend.id
+  value = aws_s3_bucket.bucket.id
 }
 
 output "terraform_backend_s3_bucket_arn" {
-  value = aws_s3_bucket.backend.arn
+  value = aws_s3_bucket.bucket.arn
 }
 
 output "s3_kms_key_arn" {

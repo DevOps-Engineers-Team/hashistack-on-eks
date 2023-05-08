@@ -47,8 +47,12 @@ variable "subnet_ids" {
     default = []
 }
 
-variable "lifecycle_transition" {
-    default = "autoscaling:EC2_INSTANCE_LAUNCHING"
+variable "asg_lifecycle_transition" {
+    default = "autoscaling:EC2_INSTANCE_TERMINATING"
+}
+
+variable "asg_default_result" {
+    default = "CONTINUE"
 }
 
 variable "sg_ingress_rules" {

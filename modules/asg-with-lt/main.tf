@@ -45,6 +45,14 @@ resource "aws_launch_template" "asg_lt" {
       arn = aws_iam_instance_profile.asg_profile.arn
     }
 
+    tag_specifications {
+    resource_type = "instance"
+
+    tags = {
+      Name = var.asg_name
+    }
+  }
+
     instance_type = var.instance_type
     image_id = var.image_id
 
@@ -53,9 +61,7 @@ resource "aws_launch_template" "asg_lt" {
     user_data = var.user_data_script != null ? base64encode(var.user_data_script) : null
 }
 
-
 resource "aws_autoscaling_group" "asg" {
-  # availability_zones = var.az_list
   desired_capacity   = var.desired_cap
   max_size           = var.max_cap
   min_size           = var.min_cap
@@ -66,12 +72,18 @@ resource "aws_autoscaling_group" "asg" {
   }
 }
 
-# resource "aws_autoscaling_lifecycle_hook" "asg_lifecycle_hook" {
-#   name                   =  "${var.asg_name}-lifecycle-hook"
-#   autoscaling_group_name = aws_autoscaling_group.asg.name
-#   lifecycle_transition   = var.lifecycle_transition # "autoscaling:EC2_INSTANCE_LAUNCHING"
-#   role_arn                = aws_iam_role.asg_role.arn
-# }
+resource "aws_autoscaling_lifecycle_hook" "asg_termination_lifecycle_hook" {
+  name                   =  "${var.asg_name}-lifecycle-hook"
+  autoscaling_group_name = aws_autoscaling_group.asg.name
+  lifecycle_transition   = var.asg_lifecycle_transition
+  default_result         = var.asg_default_result
+  role_arn                = aws_iam_role.asg_role.arn
+  notification_target_arn = aws_sns_topic.asg_sns_topic.arn
+}
+
+resource "aws_sns_topic" "asg_sns_topic" {
+  name = "${var.asg_name}-sns-topic"
+}
 
 resource "aws_iam_instance_profile" "asg_profile" {
   name = "${var.asg_name}-profile"
@@ -87,7 +99,10 @@ resource "aws_iam_role" "asg_role" {
       {
         Effect: "Allow",
         Principal: {
-          Service: "ec2.amazonaws.com"
+          Service: [
+            "ec2.amazonaws.com",
+            "autoscaling.amazonaws.com"
+          ]
         },
         Action: "sts:AssumeRole",
       }

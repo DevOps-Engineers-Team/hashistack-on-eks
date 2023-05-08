@@ -18,6 +18,10 @@ cat > /etc/consul.d/consul.hcl << EOF
 ${consul_hcl_file_content}
 EOF
 
+cat > /home/ec2-user/consul-agent-ca.pem << EOF 
+${tls_ca_file}
+EOF
+
 cat > /usr/lib/systemd/system/consul.service << EOF 
 bind_addr = $PRIVATE_IP
 ${consul_service_file_content}

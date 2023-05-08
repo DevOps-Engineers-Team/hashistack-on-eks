@@ -1,9 +1,13 @@
+locals {
+  full_bucket_name = var.bucket_name_postfix == null ? var.bucket_name : "${var.bucket_name}-${var.bucket_name_postfix}"
+}
+
 variable "bucket_name" {}
 
 variable "environment" {}
 
 variable "bucket_name_postfix" {
-  default = "terraform-backend"
+  default = null
 }
 
 variable "bucket_policy_allowed_roles_arns" {

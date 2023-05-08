@@ -10,6 +10,7 @@ data "template_file" "ingress_yaml" {
         success_codes = var.success_codes
         nodeport_name = var.nodeport_name
         nodeport_number = var.nodeport_number
+        backend_protocol = var.backend_protocol
     }
 }
 

@@ -5,7 +5,7 @@ resource "kubectl_manifest" "ingress" {
 
 resource "time_sleep" "wait_in_seconds" {
   depends_on = [kubectl_manifest.ingress]
-  create_duration = "30s"
+  create_duration = "60s"
 }
 
 resource "aws_route53_record" "cname_record" {
