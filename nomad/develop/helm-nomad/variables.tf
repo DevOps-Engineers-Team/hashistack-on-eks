@@ -1,9 +1,18 @@
 locals {
   environment   = basename(dirname(path.cwd))
-  config_name = basename(dirname(dirname(path.cwd)))
+  config_name = "core-infra"
   application  = "gitops"
+  account_id   = data.aws_caller_identity.current.account_id
   cluster_name = "${local.config_name}-${local.environment}-${local.application}-cluster"
   helm_chart_path = "${path.module}/../../helm-chart"
+
+  helm_sets = {
+    nomad_image = {
+      name = "sts.container.imageUri"
+      value = "${local.account_id}.dkr.ecr.eu-west-1.amazonaws.com/nomad:1.0.0"
+      type  = "string"
+    }
+  }
 }
 
 variable "app_name" {
@@ -23,25 +32,16 @@ variable "create_namespace" {
   default = false
 }
 
-variable "helm_chart_name" {
-  default = "nomad"
-}
 
-variable "helm_chart_version" {
-  default = "1.1.1"
-}
-
-variable "helm_sets" {
-  default = {}
-}
-
-variable "image_version" {
-  default = "hashicorp/consul:1.15.2"
-}
-
-variable "datacenter_name" {
-  default = "aws-eks"
-}
+# variable "helm_sets" {
+#   default = {
+#     nomad_image = {
+#       name = "sts.container.imageUri"
+#       value = ""
+#       type  = "string"
+#     }
+#   }
+# }
 
 variable "server_replica_count" {
     type = number

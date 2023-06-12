@@ -3,26 +3,26 @@ module "nomad_namespace" {
   namespace =  var.kubernetes_namespace
 }
 
-module "gossip_encrypt_key" {
-  depends_on = [module.nomad_namespace]
-  source               = "../../../modules/k8s-secret"
-  name                 = "${var.app_name}-gossip-encrypt-keyring"
-  namespace            = var.kubernetes_namespace
-  data                 = {
-    keyring = data.aws_ssm_parameter.nomad_keyring.value
-    key = data.aws_ssm_parameter.nomad_keyring.value
-  }
-}
+# module "gossip_encrypt_key" {
+#   depends_on = [module.nomad_namespace]
+#   source               = "../../../modules/k8s-secret"
+#   name                 = "${var.app_name}-gossip-encrypt-keyring"
+#   namespace            = var.kubernetes_namespace
+#   data                 = {
+#     keyring = data.aws_ssm_parameter.nomad_keyring.value
+#     key = data.aws_ssm_parameter.nomad_keyring.value
+#   }
+# }
 
 module "nomad_helm_chart" {
-    depends_on = [module.gossip_encrypt_key]
+    depends_on = [module.nomad_namespace]
     source = "../../../modules/generic-helm-release"
     environment = local.environment
     kubernetes_namespace = var.kubernetes_namespace
     create_namespace = var.create_namespace
-    helm_chart_name = loca.helm_chart_path # "./chart"
-    helm_init_values = module.helm_config.helm_values
-    helm_sets = var.helm_sets
+    helm_chart_name = local.helm_chart_path # "./chart"
+    # helm_init_values = module.helm_config.helm_values
+    helm_sets = local.helm_sets
 }
 
 # module "ingress_alb_cname" {

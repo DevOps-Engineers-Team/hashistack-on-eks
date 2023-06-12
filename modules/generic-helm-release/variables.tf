@@ -36,6 +36,7 @@ variable "skip_crds" {
 variable "helm_chart_version" {
   description = "helm chart version to use"
   type        = string
+  default = null
 }
 
 variable "helm_sets" {

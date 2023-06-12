@@ -8,6 +8,8 @@
 #   datacenter_name = var.datacenter_name
 # }
 
+data "aws_caller_identity" "current" {}
+
 data "aws_eks_cluster" "cluster" {
   name = local.cluster_name
 }
@@ -30,6 +32,6 @@ data "aws_route53_zone" "public" {
   private_zone = false
 }
 
-data "aws_ssm_parameter" "consul_keyring" {
-  name = "/secrets/core-infra/develop/consul_keyring"
-}
+# data "aws_ssm_parameter" "consul_keyring" {
+#   name = "/secrets/core-infra/develop/consul_keyring"
+# }
