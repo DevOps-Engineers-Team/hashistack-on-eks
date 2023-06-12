@@ -1,0 +1,66 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.sts.name }}
+  namespace: {{ .Values.k8s.ns }}
+spec:
+  serviceName: {{ .Values.svc.name }}
+  replicas: {{ .Values.sts.replicas }}
+  template:
+    metadata:
+      labels:
+        app: nomad
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - nomad
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: nomad
+          image: {{ .Values.sts.container.imageUri }}
+          args:
+            {{- range .Values.sts.container.args }}
+            - {{ . }}
+            {{- end }}
+            - "agent"
+            - "-config=/etc/nomad/nomad.d/server.hcl"
+          ports:
+            {{- range .Values.sts.container.ports }}
+            - name: {{ .name }}
+              containerPort: {{ .containerPort }}
+              protocol: {{ .protocol }}
+            {{- end }}
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+          volumeMounts:
+            {{- range .Values.sts.container.volMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+            {{- end }}
+      terminationGracePeriodSeconds: 10
+      securityContext:
+        fsGroup: 1000
+      volumes:
+        - name: nomad-config
+          configMap:
+            name: {{ .Values.cm.name }}
+        - name: nomad-tls
+          secret:
+            secretName: nomad
+  volumeClaimTemplates:
+    - metadata:
+        name: nomad-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi

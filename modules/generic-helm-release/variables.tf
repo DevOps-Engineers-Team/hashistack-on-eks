@@ -3,6 +3,7 @@ variable "environment" {}
 variable "helm_repo_url" {
   description = "Helm repository"
   type        = string
+  default = null
 }
 
 variable "kubernetes_namespace" {
@@ -19,6 +20,7 @@ variable "create_namespace" {
 variable "helm_chart_name" {
   description = "helm chart name to use"
   type        = string
+  default = null
 }
 
 variable "helm_init_values" {
@@ -34,6 +36,7 @@ variable "skip_crds" {
 variable "helm_chart_version" {
   description = "helm chart version to use"
   type        = string
+  default = null
 }
 
 variable "helm_sets" {
