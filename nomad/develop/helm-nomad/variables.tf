@@ -3,7 +3,7 @@ locals {
   config_name = basename(dirname(dirname(path.cwd)))
   application  = "gitops"
   cluster_name = "${local.config_name}-${local.environment}-${local.application}-cluster"
-  helm_chart_path = "${path.module}/../helm-chart"
+  helm_chart_path = "${path.module}/../../helm-chart"
 }
 
 variable "app_name" {
