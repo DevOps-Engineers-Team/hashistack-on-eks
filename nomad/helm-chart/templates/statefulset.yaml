@@ -1,11 +1,11 @@
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  name: nomad
-  namespace: nomad
+  name: {{ .Values.sts.name }}
+  namespace: {{ .Values.k8s.ns }}
 spec:
-  serviceName: nomad
-  replicas: 3
+  serviceName: {{ .Values.svc.name }}
+  replicas: {{ .Values.sts.replicas }}
   template:
     metadata:
       labels:
@@ -23,41 +23,35 @@ spec:
               topologyKey: kubernetes.io/hostname
       containers:
         - name: nomad
-          image: "gcr.io/hightowerlabs/nomad:0.6.3"
+          image: {{ .Values.sts.container.imageUri }}
           args:
+            {{- range .Values.sts.container.args }}
+            - {{ . }}
+            {{- end }}
             - "agent"
             - "-config=/etc/nomad/nomad.d/server.hcl"
           ports:
-            - name: http
-              containerPort: 4646
-              protocol: "TCP"
-            - name: rpc
-              containerPort: 4647
-              protocol: "TCP"
-            - name: serf-tcp
-              containerPort: 4648
-              protocol: "TCP"
-            - name: serf-udp
-              containerPort: 4648
-              protocol: "UDP"
+            {{- range .Values.sts.container.ports }}
+            - name: {{ .name }}
+              containerPort: {{ .containerPort }}
+              protocol: {{ .protocol }}
+            {{- end }}
           resources:
             requests:
               cpu: "500m"
               memory: "1Gi"
           volumeMounts:
-            - name: nomad-config
-              mountPath: /etc/nomad/nomad.d
-            - name: nomad-data
-              mountPath: /var/lib/nomad
-            - name: nomad-tls
-              mountPath: /etc/nomad/tls
+            {{- range .Values.sts.container.volMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+            {{- end }}
       terminationGracePeriodSeconds: 10
       securityContext:
         fsGroup: 1000
       volumes:
         - name: nomad-config
           configMap:
-            name: nomad
+            name: {{ .Values.cm.name }}
         - name: nomad-tls
           secret:
             secretName: nomad

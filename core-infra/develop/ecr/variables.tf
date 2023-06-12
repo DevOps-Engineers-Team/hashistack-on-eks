@@ -7,6 +7,9 @@ locals {
     tfenv = {
       name =  "tfenv"
     }
+    nomad = {
+      name = "nomad"
+    }
   }
 }
 

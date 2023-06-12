@@ -20,7 +20,7 @@ module "nomad_helm_chart" {
     environment = local.environment
     kubernetes_namespace = var.kubernetes_namespace
     create_namespace = var.create_namespace
-    helm_chart_name = "./chart"
+    helm_chart_name = loca.helm_chart_path # "./chart"
     helm_init_values = module.helm_config.helm_values
     helm_sets = var.helm_sets
 }

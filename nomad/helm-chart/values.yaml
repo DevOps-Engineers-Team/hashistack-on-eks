@@ -1,0 +1,71 @@
+k8s:
+  ns: nomad
+
+sts:
+  name: nomad
+  replicas: 3
+  container:
+    imageUri:
+    ports:
+      - name: http
+        containerPort: 4646
+        protocol: "TCP"
+      - name: rpc
+        containerPort: 4647
+        protocol: "TCP"
+      - name: serf-tcp
+        containerPort: 4648
+        protocol: "TCP"
+      - name: serf-udp
+        containerPort: 4648
+        protocol: "UDP"
+    volMounts:
+      - name: nomad-config
+        mountPath: /etc/nomad/nomad.d
+      - name: nomad-data
+        mountPath: /var/lib/nomad
+      - name: nomad-tls
+        mountPath: /etc/nomad/tls
+    args:
+      - "agent"
+      - "-config=/etc/nomad/nomad.d/server.hcl"
+
+svc:
+  name: name
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 4646
+      protocol: "TCP"
+    - name: rpc
+      port: 4647
+      protocol: "TCP"
+
+cm:
+  name: nomad
+  content: |
+    bind_addr = "0.0.0.0"
+    data_dir = "/var/lib/nomad"
+    
+    server {
+      enabled = true
+      bootstrap_expect = 3
+    }
+
+    tls {
+      ca_file = "/etc/nomad/tls/ca.pem"
+      cert_file = "/etc/nomad/tls/nomad.pem"
+      http = true
+      key_file = "/etc/nomad/tls/nomad-key.pem"
+      rpc = true
+      verify_https_client = true
+    }
+
+    # vault {
+    #   address = "https://vault.service.consul:8200"
+    #   ca_file = "/etc/vault/tls/ca.pem"
+    #   cert_file = "/etc/vault/tls/vault.pem"
+    #   create_from_role = "nomad-cluster"
+    #   enabled = true
+    #   key_file = "/etc/vault/tls/vault-key.pem"
+    # }
